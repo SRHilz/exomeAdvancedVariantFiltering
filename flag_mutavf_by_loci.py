@@ -63,11 +63,13 @@ def flag_mutavf_by_loci(mutavffile, algorithms, chromosomes, starts, ends, flags
             while j < len(chromosomes):#compares the line to each of the loci specified to flag
                 if data[i][chr] == chromosomes[j]:
                     if starts[j] <= int(data[i][pos]) < ends[j]:
-                        print('Variant in ',flags[j])
                         if data[i][flg] == 'NA':
                             data[i][flg] = flags[j]
+                            print('Variant in ',flags[j])
                         else:
-                            data[i][flg] = data[i][flg] + ';' + flags[j]
+                            if flags[j] not in data[i][flg]: #spares us from repeating flag > once
+                                data[i][flg] = data[i][flg] + ';' + flags[j]
+                                print('Variant in ',flags[j])
                 j += 1
 
     ## output updated file

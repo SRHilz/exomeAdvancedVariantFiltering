@@ -35,7 +35,7 @@ def get_repeat_loci(repeat_masker_file):
     ## read ENCODE DAC Blacklist file
     data = gzip.open(repeat_masker_file).readlines()
 
-    ## set header indexes (DAC file has no headers, so manually specify content here)
+    ## set column indexes (RepeatMasker file has no headers, so manually specify content here)
     chr = 0
     stt = 1
     end = 2

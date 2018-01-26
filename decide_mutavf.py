@@ -35,7 +35,7 @@ def decide_mutavf(mutavffile):
     for i,s in enumerate(data):
         data[i] = s.rstrip().split('\t')
         flags = data[i][flg].split(';')
-        if "whitelist" in flags: #if is listed on our whitelist
+        if "Whitelist:" in flags: #if is listed on our whitelist
             data[i][dec] = 'retain'
         elif any('Repeat:' in x for x in flags): #if is found in RepeatMasker locus
             data[i][dec] = 'discard'

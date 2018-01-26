@@ -2,16 +2,13 @@
 ##########################################################################################
 # UCSF
 # Costello Lab
-# Read in ENCODE DAC Blacklisted Regions bed and pull out loci info for each Blacklisted
-#   region
+# Read in whitelist file(s) and pull out loci info for each region
 # Author: srhilz
-# Version: v1 (2018.01.24)
+# Version: v1 (2018.01.26)
 
 # Input:
-#   1. dac_blacklist_file - bed file from ENCODE with blacklisted regions
-#       https://www.encodeproject.org/annotations/ENCSR636HFF/
-#       Should be from same genome build used to call mutations, or else
-#       should convert.
+#   1. hotspot_file - hotspot-list-union-v1-v2.txt, a bed-like file from MSK, downloaded
+#       2018.01.26 from https://github.com/mskcc/ngs-filters/tree/master/data
 # Output:
 #   1. chromosomes - chromosome(s) of loci. If more than one, will be a comma-
 #       separated list (ex. "chr6,chr7"). Importantly, order  corresponds to order of
@@ -25,20 +22,20 @@
 #
 ##########################################################################################
 
-import sys, gzip
+import sys
 
-def get_dac_blacklist_loci(dac_blacklist_file):
+def get_whitelist_loci(hotspot_file):
 
-    print("IDing loci in ENCODE DAC Blacklist")
+    print("IDing loci in hotspot file to whitelist")
 
-    ## read ENCODE DAC Blacklist file
-    data = gzip.open(dac_blacklist_file).readlines()
+    ## read hotspot file
+    data = open(hotspot_file).readlines()
+    data = data[1:] # remove header
 
-    ## set column indexes (DAC file has no headers, so manually specify content here)
-    chr = 0
-    stt = 1
-    end = 2
-    flg = 3
+    ## set column indexes manually
+    chr = 1
+    stt = 2
+    end = 3
 
     ## define empty arrays to collect data in
     chromosomes = []
@@ -49,10 +46,10 @@ def get_dac_blacklist_loci(dac_blacklist_file):
     ## gather locus information in arrays for file
     for line in data:
         line = line.rstrip().split('\t')
-        chromosomes.append(line[chr])
+        chromosomes.append('chr'+str(line[chr]))
         starts.append(line[stt])
-        ends.append(line[end])
-        flags.append('DAC:'+line[flg])#this makes a hybrid of a universal DAC flag + locus-specific info
+        ends.append(str(int(line[end])+1))# we need to add one to make compatible with our end coord convention
+        flags.append('Whitelist:hotspot')
 
     ## format for flag_mutavf_by_locus
     chromosomes = ','.join(chromosomes)
@@ -64,7 +61,7 @@ def get_dac_blacklist_loci(dac_blacklist_file):
 
 if __name__=="__main__":
     if len(sys.argv) != 2:
-        print 'usage: %s dac_blacklist_file' %(sys.argv[0])
+        print 'usage: %s get_whitelist_loci' %(sys.argv[0])
         sys.exit(1)
 
-    get_dac_blacklist_loci(sys.argv[1].strip())
+    get_whitelist_loci(sys.argv[1].strip())

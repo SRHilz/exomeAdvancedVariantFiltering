@@ -22,26 +22,34 @@ import get_repeat_loci
 import get_dac_blacklist_loci
 import flag_mutavf_by_loci
 import decide_mutavf
+import get_whitelist_loci
 
 # Part 0: File paths and
 mutfile = sys.argv[1]
 mutavffile = mutfile.replace('.mutations','.mutations.avf')
+hotspot_file = 'hotspot-list-union-v1-v2.txt'
 repeat_masker_file = 'UCSC_RepeatMasker_rmsk_hg19.bed.gz'
 dac_blacklist_file = 'ENCFF001TDO.bed.gz'
 
 # Part 1: Initializes by setting up a mutation avftated file with placeholder columns
 mutavf_init.mutavf_init(mutfile)
 
-# Part 2a: IDs loci in repeat regions
+# Part 2: IDs loci in whitelist
+white_chromosomes, white_starts, white_ends, white_flags = get_whitelist_loci.get_whitelist_loci(hotspot_file)
+
+# Part 2b: Update mutavf file with flags for whitelist regions
+flag_mutavf_by_loci.flag_mutavf_by_loci(mutavffile, 'MuTect,Pindel', white_chromosomes, white_starts, white_ends, white_flags)
+
+# Part 3a: IDs loci in repeat regions
 rep_chromosomes, rep_starts, rep_ends, rep_flags = get_repeat_loci.get_repeat_loci(repeat_masker_file)
 
-# Part 2b: Update mutavf file with flags for repeats
+# Part 3b: Update mutavf file with flags for repeats
 flag_mutavf_by_loci.flag_mutavf_by_loci(mutavffile, 'MuTect,Pindel', rep_chromosomes, rep_starts, rep_ends, rep_flags)
 
-# Part 3: IDs loci in ENCODE DAC blacklisted regions
+# Part 4: IDs loci in ENCODE DAC blacklisted regions
 dac_chromosomes, dac_starts, dac_ends, dac_flags = get_dac_blacklist_loci.get_dac_blacklist_loci(dac_blacklist_file)
 
-# Part 3b: Update mutavf file with flags for ENCODE DAC blacklisted regions
+# Part 4b: Update mutavf file with flags for ENCODE DAC blacklisted regions
 flag_mutavf_by_loci.flag_mutavf_by_loci(mutavffile, 'MuTect,Pindel', dac_chromosomes, dac_starts, dac_ends, dac_flags)
 
 # Part N: Make final decisions to retain or discard each variant based on flags
