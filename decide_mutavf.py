@@ -41,6 +41,8 @@ def decide_mutavf(mutavffile):
             data[i][dec] = 'discard'
         elif any('DAC:' in x for x in flags): #if is found in ENCODE DAC blacklist
             data[i][dec] = 'discard'
+        elif any('Lowqual:' in x for x in flags): #if is found in lowquality region, or alt qual is lower than ref qual
+            data[i][dec] = 'discard'
         else: #if there is no reason to discard it, retain
             data[i][dec] = 'retain'
 
