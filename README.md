@@ -3,7 +3,7 @@ A post-mutation calling pipeline for additional variant filtering.
 
 To use, clone repository to the desired directory, then run with:
 
-   `advanced_variant_filtering.py mutfile`
+   `python advanced_variant_filtering.py mutfile`
    
    
 ### Details on input and output:
